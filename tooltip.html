@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <script src="https://cdn.rawgit.com/konvajs/konva/1.6.5/konva.min.js"></script>
+    <meta charset="utf-8">
+    <title>Konva Drag and Drop Demo</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: #F0F0F0;
+        }
+        
+        #container {
+            margin-left: 250px;
+            background-color: grey;
+            width: 500px;
+            height: 500px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="container"></div>
+    <script>
+        const debug = false;
+        var width = window.innerWidth;
+        var height = window.innerHeight;
+        var stage = new Konva.Stage({
+            container: 'container',
+            width: 500,
+            height: 500,
+        });
+
+        function writeMessage(message) {
+            text.setText(message);
+            layer.draw();
+        }
+
+
+        // Layyers
+        var layer = new Konva.Layer();
+        var tooltipLayer = new Konva.Layer();
+
+        var text = new Konva.Text({
+            x: 10,
+            y: 10,
+            fontFamily: 'Calibri',
+            fontSize: 24,
+            text: '',
+            fill: 'black'
+        });
+
+
+        // create N modules from type X
+        // TODO calculate boundaries generic from radius
+        for (i = 0; i < 6; i++) {
+            //var layer = new Konva.Layer();
+            var circle = new Konva.Circle({
+                x: stage.getWidth() / 2 + (i * 30),
+                y: stage.getHeight() / 2,
+                radius: 50,
+                fill: 'red',
+                stroke: 'black',
+                strokeWidth: 4,
+                draggable: true,
+                // This function is to ensure that the element stays within the boundaries of the stage
+                dragBoundFunc: function(pos) {
+                    if (debug) {
+                        console.log(this.getAbsolutePosition().x + "," + pos.y)
+                    }
+                    if (pos.x <= 75) { // || pos.x >= 425 || pos.y <= 75 || pos.y >= 425
+                        if (pos.y >= 425) {
+                            return {
+                                x: this.getAbsolutePosition().x,
+                                y: this.getAbsolutePosition().y
+                            }
+                        }
+                        if (pos.y <= 75) {
+                            return {
+                                x: this.getAbsolutePosition().x,
+                                y: this.getAbsolutePosition().y
+                            }
+                        }
+                        return {
+                            x: this.getAbsolutePosition().x,
+                            y: pos.y
+                        }
+                    } else if (pos.x >= 425) {
+                        if (pos.y >= 425) {
+                            return {
+                                x: this.getAbsolutePosition().x,
+                                y: this.getAbsolutePosition().y
+                            }
+                        }
+                        if (pos.y <= 75) {
+                            return {
+                                x: this.getAbsolutePosition().x,
+                                y: this.getAbsolutePosition().y
+                            }
+                        }
+                        return {
+                            x: this.getAbsolutePosition().x,
+                            y: pos.y
+                        }
+                    } else if (pos.y <= 75) {
+                        if (pos.x >= 425) {
+                            return {
+                                x: this.getAbsolutePosition().x,
+                                y: this.getAbsolutePosition().y
+                            }
+                        }
+                        if (pos.x <= 75) {
+                            return {
+                                x: this.getAbsolutePosition().x,
+                                y: this.getAbsolutePosition().y
+                            }
+                        }
+                        return {
+                            x: pos.x,
+                            y: this.getAbsolutePosition().y
+                        }
+                    } else if (pos.y >= 425) {
+                        if (pos.x >= 425) {
+                            return {
+                                x: this.getAbsolutePosition().x,
+                                y: this.getAbsolutePosition().y
+                            }
+                        }
+                        if (pos.x <= 75) {
+                            return {
+                                x: this.getAbsolutePosition().x,
+                                y: this.getAbsolutePosition().y
+                            }
+                        }
+                        return {
+                            x: pos.x,
+                            y: this.getAbsolutePosition().y
+                        }
+                    } else return pos;
+                }
+            });
+
+            // add cursor styling + stroke + opacity
+            circle.on('dragmove', function() {
+                this.opacity(0.5);
+                this.stroke('grey');
+                this.strokeWidth(5);
+                document.body.style.cursor = 'move';
+                tooltip.hide();
+                tooltipLayer.draw();
+                //layer.draw();
+            });
+
+            circle.on('dragend', function() {
+                this.opacity(1);
+                this.stroke('black');
+                this.strokeWidth(4);
+                layer.draw();
+                if (circle_collision(circle, circle2)) {
+                    writeMessage('Collision Detected');
+                } else writeMessage();
+            })
+
+            // MouseEvents
+            circle.on("mousemove", function() {
+                document.body.style.cursor = 'move';
+                var mousePos = stage.getPointerPosition();
+                // Tooltip
+                tooltip.position({
+                    x: mousePos.x - 5,
+                    y: mousePos.y - 45
+                });
+                tooltip.text("Module XYZ");
+                tooltip.show();
+                tooltipLayer.batchDraw();
+            });
+
+            circle.on('mouseout', function() {
+                document.body.style.cursor = 'default';
+                tooltip.hide();
+                tooltipLayer.draw();
+            });
+
+
+            // Touch Events
+            circle.on('tap', function() {
+
+            })
+            circle.on('touchstart', function() {
+                var mousePos = stage.getPointerPosition();
+                // Tooltip
+                tooltip.position({
+                    x: mousePos.x - 5,
+                    y: mousePos.y - 65
+                });
+                tooltip.text("Module XYZ");
+                tooltip.show();
+                tooltipLayer.batchDraw();
+            });
+
+            circle.on('touchend', function() {
+                this.opacity(1);
+                this.stroke('black');
+                this.strokeWidth(4);
+                layer.draw();
+                tooltip.hide();
+                tooltipLayer.draw();
+            });
+
+
+
+            var tooltip = new Konva.Text({
+                text: "",
+                fontFamily: "Calibri",
+                fontSize: 24,
+                padding: 5,
+                textFill: "white",
+                fill: "black",
+                alpha: 0.75,
+                visible: false
+            });
+
+
+            /*
+             * dblclick to remove box for desktop app
+             * and dbltap to remove box for mobile app
+             */
+
+            circle.on("dblclick dbltap", function() {
+                this.destroy();
+                layer.draw();
+            });
+
+            layer.add(circle, text);
+        }
+        // Kreis
+
+
+
+
+        layer.add(text);
+        stage.add(layer);
+        tooltipLayer.add(tooltip);
+        stage.add(tooltipLayer);
+
+
+        function organize_position(amount_elements) {
+
+            function add_datapoint() {
+                this.x = x;
+                this.y = y;
+            };
+
+            console.log("Calculate Position for " + amount_elements);
+
+            var positionArray = []
+            var x1, x2, x3, x4;
+            var y1, y2, y3, y4;
+
+            if (amount_elements === 1) {
+                console.log("IF(1) - Calculate Position for " + amount_elements);
+                x1 = stage.getWidth() / 2
+                y1 = stage.getHeight() / 2
+
+                positionArray.push([x1, y2]);
+                console.log('Calculated Coordinates ' + positionArray)
+                return positionArray
+            }
+            if (amount_elements === 2) {
+                console.log("IF(2) - Calculate Position for " + amount_elements);
+                x1 = stage.getWidth() / 3
+                y1 = stage.getHeight() / 2
+                x2 = x1 * 2
+                y2 = y1
+
+                positionArray.push([x1, y2], [x2, y2]);
+                console.log('Calculated Coordinates ' + positionArray)
+                return positionArray
+            }
+            if (amount_elements > 2 && amount_elements <= 4) {
+                console.log("IF(2 > x <= 4) - Calculate Position for " + amount_elements);
+                // links oben
+                x1 = stage.getWidth() / 3;
+                y1 = stage.getHeight() / 3;
+                // rechts oben
+                x2 = x1 * 2;
+                y2 = y1;
+                // links unten
+                x3 = stage.getWidth() / 3;
+                y3 = stage.getHeight() / 3 * 2;
+                // rechts unten
+                x4 = x3 * 2;
+                y4 = y3;
+
+                positionArray.push([x1, y2], [x2, y2], [x3, y3], [x4, y4]);
+                console.log('Calculated Coordinates ' + positionArray)
+                return positionArray
+            }
+        }
+
+
+        // https://developer.mozilla.org/en-US/docs/Games/Techniques/2D_collision_detection
+        function circle_collision(circle1, circle2, collsion_detct) {
+            var circle1 = {
+                radius: circle1.getRadius(),
+                x: circle1.getX(), // 5
+                y: circle1.getY()
+            };
+            var circle2 = {
+                radius: circle2.getRadius(),
+                x: circle2.getX(),
+                y: circle2.getY()
+            };
+
+            var dx = circle1.x - circle2.x;
+            var dy = circle1.y - circle2.y;
+            var distance = Math.sqrt(dx * dx + dy * dy);
+
+            if (debug) {
+                console.log('Circle1: ' + JSON.stringify(circle1));
+                console.log('Circle2: ' + JSON.stringify(circle2));
+            }
+
+            if (distance < circle1.radius + circle2.radius) {
+                // collision detected!
+                return true;
+            } else return false;
+        };
+
+        organize_position(4)
+    </script>
+</body>
+
+</html>
