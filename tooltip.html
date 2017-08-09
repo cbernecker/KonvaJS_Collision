@@ -25,7 +25,7 @@
 <body>
     <div id="container"></div>
     <script>
-        const debug = false;
+        const debug = true;
         var width = window.innerWidth;
         var height = window.innerHeight;
         var stage = new Konva.Stage({
@@ -56,11 +56,15 @@
 
         // create N modules from type X
         // TODO calculate boundaries generic from radius
-        for (i = 0; i < 6; i++) {
+        
+        var n_elements = 6
+        for (i = 0; i < n_elements; i++) {
             //var layer = new Konva.Layer();
+            var pos_array = organize_position(n_elements)  
+            //console.log(pos_array[i][0])
             var circle = new Konva.Circle({
-                x: stage.getWidth() / 2 + (i * 30),
-                y: stage.getHeight() / 2,
+                x: pos_array[i][0],
+                y: pos_array[i][1],
                 radius: 50,
                 fill: 'red',
                 stroke: 'black',
@@ -257,47 +261,88 @@
             console.log("Calculate Position for " + amount_elements);
 
             var positionArray = []
-            var x1, x2, x3, x4;
-            var y1, y2, y3, y4;
+            var x1, x2, x3, x4, x5, x6;
+            var y1, y2, y3, y4, y5, y6;
 
             if (amount_elements === 1) {
                 console.log("IF(1) - Calculate Position for " + amount_elements);
-                x1 = stage.getWidth() / 2
-                y1 = stage.getHeight() / 2
+                x1 = stage.getWidth() / 2;
+                y1 = stage.getHeight() / 2;
 
-                positionArray.push([x1, y2]);
-                console.log('Calculated Coordinates ' + positionArray)
-                return positionArray
+                positionArray.push([x1, y1]);
+                console.log(positionArray);
+                return positionArray;
             }
             if (amount_elements === 2) {
                 console.log("IF(2) - Calculate Position for " + amount_elements);
-                x1 = stage.getWidth() / 3
-                y1 = stage.getHeight() / 2
-                x2 = x1 * 2
-                y2 = y1
+                x1 = stage.getWidth() / 3;
+                y1 = stage.getHeight() / 2;
+                x2 = x1 * 2;
+                y2 = y1;
 
                 positionArray.push([x1, y2], [x2, y2]);
-                console.log('Calculated Coordinates ' + positionArray)
-                return positionArray
+                console.log(positionArray);
+                return positionArray;
             }
             if (amount_elements > 2 && amount_elements <= 4) {
                 console.log("IF(2 > x <= 4) - Calculate Position for " + amount_elements);
                 // links oben
-                x1 = stage.getWidth() / 3;
-                y1 = stage.getHeight() / 3;
+                x1 = stage.getWidth() / 4;
+                y1 = stage.getHeight() / 4;
                 // rechts oben
-                x2 = x1 * 2;
+                x2 = x1 * 3;
                 y2 = y1;
                 // links unten
-                x3 = stage.getWidth() / 3;
-                y3 = stage.getHeight() / 3 * 2;
+                x3 = stage.getWidth() / 4;
+                y3 = stage.getHeight() / 4 * 3;
                 // rechts unten
-                x4 = x3 * 2;
+                x4 = x3 * 3;
                 y4 = y3;
 
                 positionArray.push([x1, y2], [x2, y2], [x3, y3], [x4, y4]);
-                console.log('Calculated Coordinates ' + positionArray)
-                return positionArray
+                console.log(positionArray);
+                return positionArray;
+            }
+            if (amount_elements === 5) {
+                console.log("IF(5) - Calculate Position for " + amount_elements);
+                positionArray = organize_position(4);
+                positionArray.push(organize_position(1)[0]);
+                console.log(positionArray)
+                return positionArray;
+            }
+            if (amount_elements === 6) {
+                console.log("IF(6) - Calculate Position for " + amount_elements);
+                // links oben
+                x1 = stage.getWidth() / 4;
+                y1 = stage.getHeight() / 4;
+                // oben mitte
+                x2 = x1 * 2;
+                y2 = y1;
+                // oben rechts
+                x3 = x1 * 3;
+                y3 = y1;
+                // links unten
+                x4 = stage.getWidth() / 4;
+                y4 = stage.getHeight() / 4 * 3;
+                // unten mitte 
+                x5 = x4 * 2
+                y5 = y4;
+                // unten rechts
+                x6 = x4 * 3
+                y6 = y4;
+
+                console.log(positionArray)
+                positionArray.push([x1, y2], [x2, y2], [x3, y3],[x4, y4], [x5, y5], [x6, y6]);
+                return positionArray;
+            }
+            if (amount_elements > 6 ) {
+                console.log("IF(>6) - Calculate Position for " + amount_elements);
+                
+                positionArray = organize_position(6);
+                
+                console.log(positionArray)
+                positionArray.push([x1, y2], [x2, y2], [x3, y3],[x4, y4], [x5, y5], [x6, y6]);
+                return positionArray;
             }
         }
 
@@ -330,7 +375,7 @@
             } else return false;
         };
 
-        organize_position(4)
+        //organize_position(4)
     </script>
 </body>
 
