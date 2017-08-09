@@ -56,12 +56,12 @@
 
         // create N modules from type X
         // TODO calculate boundaries generic from radius
-        
-        var n_elements = 6
+
+        var n_elements = parseInt(getQueryVariable("elements"))
         for (i = 0; i < n_elements; i++) {
             //var layer = new Konva.Layer();
-            var pos_array = organize_position(n_elements)  
-            //console.log(pos_array[i][0])
+            var pos_array = organize_position(n_elements)
+                //console.log(pos_array[i][0])
             var circle = new Konva.Circle({
                 x: pos_array[i][0],
                 y: pos_array[i][1],
@@ -332,16 +332,25 @@
                 y6 = y4;
 
                 console.log(positionArray)
-                positionArray.push([x1, y2], [x2, y2], [x3, y3],[x4, y4], [x5, y5], [x6, y6]);
+                positionArray.push([x1, y2], [x2, y2], [x3, y3], [x4, y4], [x5, y5], [x6, y6]);
                 return positionArray;
             }
-            if (amount_elements > 6 ) {
+            if (amount_elements > 6) {
                 console.log("IF(>6) - Calculate Position for " + amount_elements);
-                
+                // links mitte
+                x1 = stage.getWidth() / 4;
+                y1 = stage.getHeight() / 2;
+                // mitte mitte
+                x2 = stage.getWidth() / 2;
+                y2 = y1;
+                // rechts mitte
+                x3 = x1 * 3;
+                y3 = y1;
+
                 positionArray = organize_position(6);
-                
+
                 console.log(positionArray)
-                positionArray.push([x1, y2], [x2, y2], [x3, y3],[x4, y4], [x5, y5], [x6, y6]);
+                positionArray.push([x1, y2], [x2, y2], [x3, y3]);
                 return positionArray;
             }
         }
@@ -375,7 +384,21 @@
             } else return false;
         };
 
-        //organize_position(4)
+        // parses get properties in URL
+        function getQueryVariable(variable) {
+            var query = window.location.search.substring(1);
+            var vars = query.split("&");
+            console.log(vars)
+            for (var i = 0; i < vars.length; i++) {
+                var pair = vars[i].split("=");
+                console.log(pair)
+                console.log(variable)
+                if (pair[0] === variable) {
+                    return pair[1];
+                }
+            }
+            return -1; //not found 
+        }
     </script>
 </body>
 
