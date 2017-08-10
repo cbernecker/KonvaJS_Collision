@@ -25,7 +25,7 @@
 <body>
     <div id="container"></div>
     <script>
-        const debug = true;
+        const debug = false;
         var width = window.innerWidth;
         var height = window.innerHeight;
         var stage = new Konva.Stage({
@@ -63,6 +63,7 @@
             var pos_array = organize_position(n_elements)
                 //console.log(pos_array[i][0])
             var circle = new Konva.Circle({
+                id: i,
                 x: pos_array[i][0],
                 y: pos_array[i][1],
                 radius: 50,
@@ -73,7 +74,7 @@
                 // This function is to ensure that the element stays within the boundaries of the stage
                 dragBoundFunc: function(pos) {
                     if (debug) {
-                        console.log(this.getAbsolutePosition().x + "," + pos.y)
+                        console.log(this.getAbsolutePosition().x + "," + pos.y);
                     }
                     if (pos.x <= 75) { // || pos.x >= 425 || pos.y <= 75 || pos.y >= 425
                         if (pos.y >= 425) {
@@ -170,6 +171,9 @@
 
             // MouseEvents
             circle.on("mousemove", function() {
+
+                // console.log(getAttr(id))
+                // console.log(stage.find('#1'))
                 document.body.style.cursor = 'move';
                 var mousePos = stage.getPointerPosition();
                 // Tooltip
@@ -177,7 +181,7 @@
                     x: mousePos.x - 5,
                     y: mousePos.y - 45
                 });
-                tooltip.text("Module XYZ");
+                tooltip.text("Module XYZ (" + i + ")");
                 tooltip.show();
                 tooltipLayer.batchDraw();
             });
@@ -190,8 +194,11 @@
 
 
             // Touch Events
-            circle.on('tap', function() {
-
+            circle.on('click tap', function() {
+                console.log(circle.getAttrs());
+                console.log(circle.getAttr('id'))
+                console.log(circle.getAncestors())
+                console.log(circle.getLayer())
             })
             circle.on('touchstart', function() {
                 var mousePos = stage.getPointerPosition();
