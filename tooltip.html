@@ -366,7 +366,8 @@
 
             // FIXME The last element is not detected correclty... 
             var circles = stage.find('Circle');
-            for (let i = 0; i < circles.length; i++) {
+            //for (let i = 0; i < circles.length; i++) {
+            do {
                 var investigated_circle = circles.shift();
                 for (let z = 0; z < circles.length; z++) {
                     var dx = investigated_circle.getX() - circles[z].getX();
@@ -383,7 +384,7 @@
                         return true;
                     }
                 }
-            }
+            } while (circles.length > 0)
             return false;
         };
 
