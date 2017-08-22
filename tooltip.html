@@ -25,7 +25,7 @@
 <body>
     <div id="container"></div>
     <script>
-        const debug = false;
+        const debug = true;
         var width = window.innerWidth;
         var height = window.innerHeight;
         var stage = new Konva.Stage({
@@ -163,8 +163,12 @@
                 this.opacity(1);
                 this.stroke('black');
                 this.strokeWidth(4);
+                var shape = stage.find('#1')[0].getAbsolutePosition();
+                var shapes = stage.find('Circle');
+                console.log(shape);
+                console.log(shapes)
                 layer.draw();
-                if (circle_collision(circle, circle2)) {
+                if (circle_collision()) {
                     writeMessage('Collision Detected');
                 } else writeMessage();
             })
@@ -195,10 +199,10 @@
 
             // Touch Events
             circle.on('click tap', function() {
-                console.log(circle.getAttrs());
-                console.log(circle.getAttr('id'))
-                console.log(circle.getAncestors())
-                console.log(circle.getLayer())
+                // console.log(circle.getAttrs());
+                // console.log(circle.getAttr('id'))
+                // console.log(circle.getAncestors())
+                // console.log(circle.getLayer())
             })
             circle.on('touchstart', function() {
                 var mousePos = stage.getPointerPosition();
@@ -222,19 +226,6 @@
             });
 
 
-
-            var tooltip = new Konva.Text({
-                text: "",
-                fontFamily: "Calibri",
-                fontSize: 24,
-                padding: 5,
-                textFill: "white",
-                fill: "black",
-                alpha: 0.75,
-                visible: false
-            });
-
-
             /*
              * dblclick to remove box for desktop app
              * and dbltap to remove box for mobile app
@@ -247,10 +238,17 @@
 
             layer.add(circle, text);
         }
-        // Kreis
 
-
-
+        var tooltip = new Konva.Text({
+            text: "",
+            fontFamily: "Calibri",
+            fontSize: 24,
+            padding: 5,
+            textFill: "white",
+            fill: "black",
+            alpha: 0.75,
+            visible: false
+        });
 
         layer.add(text);
         stage.add(layer);
@@ -364,31 +362,29 @@
 
 
         // https://developer.mozilla.org/en-US/docs/Games/Techniques/2D_collision_detection
-        function circle_collision(circle1, circle2, collsion_detct) {
-            var circle1 = {
-                radius: circle1.getRadius(),
-                x: circle1.getX(), // 5
-                y: circle1.getY()
-            };
-            var circle2 = {
-                radius: circle2.getRadius(),
-                x: circle2.getX(),
-                y: circle2.getY()
-            };
+        function circle_collision(collsion_detct) {
 
-            var dx = circle1.x - circle2.x;
-            var dy = circle1.y - circle2.y;
-            var distance = Math.sqrt(dx * dx + dy * dy);
+            // FIXME The last element is not detected correclty... 
+            var circles = stage.find('Circle');
+            for (let i = 0; i < circles.length; i++) {
+                var investigated_circle = circles.shift();
+                for (let z = 0; z < circles.length; z++) {
+                    var dx = investigated_circle.getX() - circles[z].getX();
+                    var dy = investigated_circle.getY() - circles[z].getY();
+                    var distance = Math.sqrt(dx * dx + dy * dy);
 
-            if (debug) {
-                console.log('Circle1: ' + JSON.stringify(circle1));
-                console.log('Circle2: ' + JSON.stringify(circle2));
+                    if (debug) {
+                        console.log('investigated_circle' + [i] + ' : ' + JSON.stringify(investigated_circle.getAttrs()));
+                        console.log('Circle' + [z] + ' : ' + JSON.stringify(circles[z].getAttrs()));
+                    }
+
+                    if (distance < investigated_circle.getRadius() + circles[z].getRadius()) {
+                        // collision detected!
+                        return true;
+                    }
+                }
             }
-
-            if (distance < circle1.radius + circle2.radius) {
-                // collision detected!
-                return true;
-            } else return false;
+            return false;
         };
 
         // parses get properties in URL
